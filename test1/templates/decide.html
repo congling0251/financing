@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="pull-right">
+            <label>用户名：{{user.username}}</label>
+            <a class="btn btn-info" href="/home/">报表页</a>
+            <a class="btn btn-info" href="/logout/">退出</a>
+        </div>
+        <div class="user_info center-block">
+            <h3>第{{config.term}}轮融资--{% ifequal config.part 1 %}公司决策{% else %}财团决策{% endifequal %}环节</h3>
+        </div>
+        <div>
+            {% ifequal user.first_name "1" %}
+                <div>
+                    您的剩余可融资资金：{{amount}}元
+                </div>
+                {% ifequal config.part 1 %}
+                　　<form action="/decide-form/" method="post" role="form" id="decide_form_1">
+                        <label>融资方式：</label>
+                        <select name="financing_type">
+                            <option value="g">股权融资</option>
+                            <option value="z">债权融资</option>
+                        </select>
+                        <label>融资金额：</label>
+                        <input type="number" max name="amount" min=0 require>
+                        <label>利率/股份：</label>
+                        <input type="number" name="interest" min=0>
+                        <label>%</label>
+                        <input class="btn btn-info" type="submit" value="提交">
+                    </form>
+                {% else %}
+                    <div>未到您决策的时间</div>
+                {% endifequal %}
+            {% else %}
+                <div>您的剩余资金：{{amount}} 元</div>
+                {% ifequal config.part 2 %}
+                　　<form action="/decide-form/" method="post" role="form" id="decide_form_2">
+                        {% for decide in decides %}
+                            <div>
+                                <label class="form_label">{{decide.from_user}}公司：</label>
+                                <input class="form_label"type="hidden" name="{{decide.from_user}}" value="{{decide.from_user}}">
+                                <label class="form_label">融资方式：</label>
+                                <label class="form_label">
+                                    {% ifequal decide.financing_type 'g' %}
+                                        股本融资
+                                    {% else %}
+                                        债权融资
+                                    {% endifequal %}
+                                </label>
+                                <input type="hidden" name="{{decide.from_user}}" value="{{decide.financing_type}}">
+                                <label class="form_label">{% ifequal decide.financing_type 'g' %}
+                                        股份：
+                                    {% else %}
+                                        利率：
+                                    {% endifequal %}{{decide.interest}}%</label>
+                                <input class="form_label" type="hidden" name="{{decide.from_user}}" value="{{decide.interest}}">
+                                <label class="form_label2">融资金额({{decide.amount}})：</label>
+                                <input class="form_label" type="number" min=0 name="{{decide.from_user}}">
+                                <input type="hidden" name="{{decide.from_user}}" value="{{decide.amount}}">
+                            </div>
+                        {% endfor %}
+                        <input class="btn btn-info" type="submit" value="提交">
+                    </form>
+                {% else %}
+                    <div>未到您决策的时间</div>
+                {% endifequal %}
+            {% endifequal %}
+            
+        </div>
+    </div>
+{% endblock %}

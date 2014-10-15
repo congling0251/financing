@@ -1,0 +1,78 @@
+/*@font-face {
+font-family: ‘fontNameRegular’;
+src: url(’/static/fonts/MFYueHei_Noncommercial-Regular.otf’);
+src: local(’fontName Regular’), 
+              local(’fontName’), 
+              url(’fontName.woff’) format(’woff’), 
+              url(’fontName.ttf’) format(’truetype’), 
+              url(’fontName.svg#fontName’) format(’svg’);
+} */
+html,body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #eee;
+}
+.banner {
+    width: 100%;
+    height: 200px;
+    background: url('/static/img/bg.jpg');
+    background-size: 100% 200px;
+    background-repeat: no-repeat;
+}
+.login_container {
+    width: 100%;
+    height: 100%;
+    background-color: #ccc;
+}
+.login_box {
+    width: 28em;
+}
+.user_info {
+    width: 28em;
+}
+.decide_table {
+    width: 80%;
+}
+.decide_table table {
+    width: 100%;
+}
+.decide_table table td{
+    font-size: 16px;
+    text-align: center;
+}
+.decide_table table tr.term_1{
+    background-color: #CCFF99;
+}
+.decide_table table tr.term_2{
+    background-color: #99CCFF;
+}
+.decide_table table tr.term_3{
+    background-color: #CCFFCC;
+}
+.decide_table table tr.term_4{
+    background-color: #CCCCFF;
+}
+
+.decide_table table tr.active{
+    background-color: #4FC219;
+}
+
+.decide_table table tr.inactive{
+    background-color: #CCCCFF;
+}
+
+.decide_table table tr.unknown{
+    background-color: #CCFFF3;
+}
+.form_label {
+    width:  100px;
+}
+
+.form_label2 {
+    width:  110px;
+}
+.count {
+    margin-top: 200px;
+    width: 500px;
+}

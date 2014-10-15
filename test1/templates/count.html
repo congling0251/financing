@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="center-block count">
+            {% if  error == 0 %}
+                <label class="text-center">第{{config.term}}轮统计完成</label>
+            {% elif error == 1%}
+                <label class="text-center">第{{config.term}}轮统计失败，您没有权限进行统计</label>
+            {% else%}
+                <label class="text-center">第{{config.term}}轮统计失败,未到统计时间</label>
+            {% endif %}
+            <a class="btn btn-info" href="/home/">报表页</a>
+        </div>
+    </div>
+{% endblock %}

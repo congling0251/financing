@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row pull-right">
+            <label>用户名：{{user.username}}</label>
+            {% if user.is_staff %}
+                <a class="btn btn-info" href="/count/">统计</a>
+            {% endif %}
+            {% if user.first_name != '' %}
+                <a class="btn btn-info" href="/decide/">决策</a>
+            {% endif %}
+            <a class="btn btn-info" href="/logout/">退出</a>
+        </div>
+        <h3>第{{config.term}}轮融资--{% ifequal config.part 1 %}公司决策{% else %}财团决策{% endifequal %}环节</h3>
+        <div class="row">
+            <p class="h1 text-center">公司融资情况表</p>
+            <div class="decide_table">
+                <table border="1">
+                    <tr>
+                        <td >轮数</td>
+                        <td >公司名</td>
+                        <td >融资方式</td>
+                        <td >期望融资金额 </td>
+                        <td >利率/股权</td>
+                    </tr>
+                {% for decide in decides1 %}
+                    <tr class="term_{{decide.financing_term}}">
+                        <td >{{decide.financing_term}}</td>
+                        <td >{{decide.from_user}}</td>
+                        <td >
+                            {% ifequal decide.financing_type 'g' %}
+                                股本融资
+                            {% else %}
+                                债权融资
+                            {% endifequal %} 
+                        </td>
+                        <td >{{decide.amount}} </td>
+                        <td >{{decide.interest}}%</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="decide_table">
+                <p  class="h1 text-center">财团投资情况表</p>
+                <table border="1">
+                    <tr>
+                        <td >轮数</td>
+                        <td >财团名</td>
+                        <td >公司名</td>
+                        <td >融资方式</td>
+                        <td >投资金额 </td>
+                        <td >利率/股权</td>
+                        <td >状态</td>
+                    </tr>
+                {% for decide in decides2 %}
+                    <tr class="{% if decide.status == 1 %}active{% elif decide.status == 2 %}inactive{% else %}unknown{% endif %} ">
+                        <td >{{decide.financing_term}}</td>
+                        <td >{{decide.from_user}}</td>
+                        <td >{{decide.to_user}}</td>
+                        <td >
+                           {% ifequal decide.financing_type 'g' %}
+                                股本融资
+                            {% else %}
+                                债权融资
+                            {% endifequal %} 
+                        </td>
+                        <td >{{decide.amount}} </td>
+                        <td >{{decide.interest}}%</td>
+                        <td >
+                            {% if decide.status == 1 %}
+                                有效
+                            {% elif decide.status == 2 %}
+                                无效
+                            {% else %}
+                                待定
+                            {% endif %} 
+                        </td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </div>
+        </div>
+        {% if user.is_staff or user.first_name == '3' %}
+            <div class="row">
+                <div class="decide_table">
+                    <p>公司融资情况表</p>
+                    <table border="1">
+                        <tr>
+                            <td >公司名</td>
+                            <td >融资金额上限</td>
+                            <td >已融资金额 </td>
+                            <td >剩余需融资金额 </td>
+                        </tr>
+                    {% for formatp in formatps %}
+                        <tr>
+                            <td >{{formatp.name}}</td>
+                            <td >{{formatp.max}}</td>
+                            <td >{{formatp.now}}</td>
+                            <td >{{formatp.left}}</td>
+                        </tr>
+                    {% endfor %}
+                    </table>
+                </div>
+                <div class="decide_table">
+                    <p>财团有效投资情况表</p>
+                    <table border="1">
+                        <tr>
+                            <td >轮数</td>
+                            <td >财团名</td>
+                            <td >公司名</td>
+                            <td >融资方式</td>
+                            <td >投资金额 </td>
+                            <td >利率/股权</td>
+                            <td >状态</td>
+                        </tr>
+                        {% for decide in decides2 %}
+                            {% if decide.status == 1 %}
+                            <tr>
+                                <td >{{decide.financing_term}}</td>
+                                <td >{{decide.from_user}}</td>
+                                <td >{{decide.to_user}}</td>
+                                <td >
+                                   {% ifequal decide.financing_type 'g' %}
+                                        股本融资
+                                    {% else %}
+                                        债权融资
+                                    {% endifequal %} 
+                                </td>
+                                <td >{{decide.amount}} </td>
+                                <td >{{decide.interest}}%</td>
+                                <td >
+                                    {% if decide.status == 1 %}
+                                        有效
+                                    {% elif decide.status == 2 %}
+                                        无效
+                                    {% else %}
+                                        待定
+                                    {% endif %} 
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
