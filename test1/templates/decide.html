@@ -12,9 +12,12 @@
         <div>
             {% ifequal user.first_name "1" %}
                 <div>
-                    您的剩余可融资资金：{{amount}}元
+                    您的已融资资金：{{amount}}元
                 </div>
-                {% ifequal config.part 1 %}
+                <div>
+                    您的融资资金额：{{user.last_name}}元。
+                </div>
+                {% if config.part == 1 and left > 0 %}
                 　　<form action="/decide-form/" method="post" role="form" id="decide_form_1">
                         <label>融资方式：</label>
                         <select name="financing_type">
@@ -22,17 +25,20 @@
                             <option value="z">债权融资</option>
                         </select>
                         <label>融资金额：</label>
-                        <input type="number" max name="amount" min=0 require>
+                        <input type="number" max name="amount" min=0 value="{{left}}" disabled="disabled" require>
                         <label>利率/股份：</label>
                         <input type="number" name="interest" min=0>
                         <label>%</label>
                         <input class="btn btn-info" type="submit" value="提交">
                     </form>
+                {% elif left <= 0 %}
+                    <div>您已经到达融资目标</div>
                 {% else %}
                     <div>未到您决策的时间</div>
-                {% endifequal %}
+                {% endif %}
             {% else %}
-                <div>您的剩余资金：{{amount}} 元</div>
+                <div>您的剩余资金：{{left}} 元</div>
+                <div>您的已使用资金：{{amount}} 元</div>
                 {% ifequal config.part 2 %}
                 　　<form action="/decide-form/" method="post" role="form" id="decide_form_2">
                         {% for decide in decides %}

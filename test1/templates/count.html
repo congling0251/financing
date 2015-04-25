@@ -6,6 +6,8 @@
                 <label class="text-center">第{{config.term}}轮统计完成</label>
             {% elif error == 1%}
                 <label class="text-center">第{{config.term}}轮统计失败，您没有权限进行统计</label>
+            {% elif error == 2%}
+                <label class="text-center">第{{config.term}}轮进入财团决策时间</label>
             {% else%}
                 <label class="text-center">第{{config.term}}轮统计失败,未到统计时间</label>
             {% endif %}

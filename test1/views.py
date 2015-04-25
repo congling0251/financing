@@ -15,12 +15,14 @@ import datetime
 #     return HttpResponse(html)
 class FormatUser(object):
     """docstring for FormatUser"""
-    def __init__(self, name,max,now,left):
+    def __init__(self, name,want,now):
         super(FormatUser, self).__init__()
         self.name = name
-        self.max = max
+        self.want = int(want)
+        self.max = int(int(want)*1.1)
+        self.min = int(int(want)*0.9)
         self.now = now
-        self.left = left
+        self.left = int(int(want)*0.9-now)
 
 @login_required(login_url='/login/')
 def home(request):
@@ -31,10 +33,10 @@ def home(request):
     formatps = []
     for p in ps:
         mydecides = Decision.objects.filter(financing_name = config.name,to_user=p.username,financing_part = 2,status=1)
-        amount = int(p.last_name)
+        amount = 0
         for mydecide in mydecides:
-            amount-=mydecide.amount
-        formatps.append(FormatUser(p.username,p.last_name,int(p.last_name)-amount,amount))
+            amount+=mydecide.amount
+        formatps.append(FormatUser(p.username,p.last_name,amount))
     t = get_template('home.html')
     html = t.render(Context({'decides1':decides1,'decides2':decides2,'config':config,'user':request.user,'formatps':formatps}))
     return HttpResponse(html)
@@ -48,17 +50,19 @@ def decide(request):
     if request.user.first_name=="2":
         decides = Decision.objects.filter(financing_name = config.name,financing_term = config.term,financing_part = 1,status=1)
         mydecides = Decision.objects.filter(financing_name = config.name,from_user=request.user.username,financing_part = 2,status=1)
-        amount = config.limit
+        amount = 0
         for mydecide in mydecides:
-            amount-=mydecide.amount
+            amount+=mydecide.amount
+        left = int(config.limit) - amount
     else:
         decides = Decision.objects.filter(financing_name = config.name,financing_term = config.term,financing_part = 1,from_user = request.user.username,status=1)
         mydecides = Decision.objects.filter(financing_name = config.name,to_user=request.user.username,financing_part = 2,status=1)
-        amount = int(request.user.last_name)
+        amount = 0
         for mydecide in mydecides:
-            amount-=mydecide.amount
+            amount+=mydecide.amount
+        left = int(request.user.last_name) - amount
     t = get_template('decide.html')
-    html = t.render(Context({'user':request.user,'config':config,'decides':decides,'amount':amount}))
+    html = t.render(Context({'user':request.user,'config':config,'decides':decides,'amount':amount,'left':left}))
     return HttpResponse(html)
 
 @csrf_exempt
@@ -69,19 +73,21 @@ def decide_form(request):
     config = Config.objects.get()
     t = get_template('decide.html')
     if request.user.first_name=="1":
-        _amount = int(request.POST.get('amount',''))
+        if request.POST.get('interest','') is None or request.POST.get('financing_type','') is None:
+            return  HttpResponseRedirect('/decide/')
+        
         _interest = float(request.POST.get('interest',''))
         _financing_type = request.POST.get('financing_type','')
-        if _amount<0:
-            _amount = 0
         if config.part !=1:
             return  HttpResponseRedirect('/decide/')
         mydecides = Decision.objects.filter(financing_name = config.name,from_user=request.user.username,financing_part = 2,status=1)
-        amount = int(request.user.last_name)
+        _amount = int(request.user.last_name)
+        hasRecieve = 0
         for mydecide in mydecides:
-            amount-=mydecide.amount
-        if amount-_amount < 0:
+            hasRecieve+=mydecide.amount
+        if _amount-hasRecieve < 0:
             return  HttpResponseRedirect('/decide/')
+        _amount = _amount - hasRecieve
         d = Decision.objects.filter(   financing_name = config.name,
                                     financing_term = config.term,
                                     financing_part = request.user.first_name,
@@ -183,9 +189,10 @@ def count(request):
             for cdecide in cdecides:
                 todecides= Decision.objects.filter(financing_name = config.name,financing_term=config.term,financing_part = 2,to_user = cdecide.from_user,status=0)
                 amount = cdecide.amount
+                total = 0
                 for todecide in todecides:
-                    amount-= todecide.amount
-                if amount<0:
+                    total+= todecide.amount
+                if amount*1.1 -total<0:
                     todecides.update(status=2)
                 else:
                     todecides.update(status=1)
@@ -195,6 +202,8 @@ def count(request):
             config.save()
         else:
             error = 2
+            config.part = 2
+            config.save()
     else:
         error = 1
     t = get_template('count.html')
