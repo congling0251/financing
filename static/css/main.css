@@ -61,7 +61,6 @@ html,body {
 .decide_table table tr.inactive{
     background-color: #CCCCFF;
 }
-
 .decide_table table tr.unknown{
     background-color: #CCFFF3;
 }

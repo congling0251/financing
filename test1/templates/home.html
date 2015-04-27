@@ -4,7 +4,7 @@
         <div class="row pull-right">
             <label>用户名：{{user.username}}</label>
             {% if user.is_staff %}
-                <a class="btn btn-info" href="/count/">统计</a>
+                <a class="btn btn-info" href="/count/">{% ifequal config.part 1 %}下阶段{% else %}统计{% endifequal %}</a>
             {% endif %}
             {% if user.first_name != '' %}
                 <a class="btn btn-info" href="/decide/">决策</a>
@@ -83,7 +83,7 @@
                 </table>
             </div>
         </div>
-        {% if user.is_staff or user.first_name == '3' %}
+        {% if user.is_staff or user.first_name == '3' or user.first_name == '2' %}
             <div class="row">
                 <div class="decide_table">
                     <p>公司融资情况表</p>
@@ -97,9 +97,9 @@
                     {% for formatp in formatps %}
                         <tr>
                             <td >{{formatp.name}}</td>
-                            <td >{{formatp.max}}</td>
+                            <td >{{formatp.want}}({{formatp.min}}-{{formatp.max}})</td>
                             <td >{{formatp.now}}</td>
-                            <td >{{formatp.left}}</td>
+                            <td >{{formatp.left}}({{formatp.left2}})</td>
                         </tr>
                     {% endfor %}
                     </table>

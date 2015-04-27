@@ -23,6 +23,7 @@ class FormatUser(object):
         self.min = int(int(want)*0.9)
         self.now = now
         self.left = int(int(want)*0.9-now)
+        self.left2 = int(int(want)-now)
 
 @login_required(login_url='/login/')
 def home(request):
@@ -50,16 +51,19 @@ def decide(request):
     if request.user.first_name=="2":
         decides = Decision.objects.filter(financing_name = config.name,financing_term = config.term,financing_part = 1,status=1)
         mydecides = Decision.objects.filter(financing_name = config.name,from_user=request.user.username,financing_part = 2,status=1)
+        umydecides = Decision.objects.filter(financing_name = config.name,from_user=request.user.username,financing_part = 2,status=0)
         amount = 0
         for mydecide in mydecides:
-            amount+=mydecide.amount
+            amount+=int(mydecide.amount)
+        for mydecide in umydecides:
+            amount+=int(mydecide.amount)
         left = int(config.limit) - amount
     else:
         decides = Decision.objects.filter(financing_name = config.name,financing_term = config.term,financing_part = 1,from_user = request.user.username,status=1)
         mydecides = Decision.objects.filter(financing_name = config.name,to_user=request.user.username,financing_part = 2,status=1)
         amount = 0
         for mydecide in mydecides:
-            amount+=mydecide.amount
+            amount+=int(mydecide.amount)
         left = int(request.user.last_name) - amount
     t = get_template('decide.html')
     html = t.render(Context({'user':request.user,'config':config,'decides':decides,'amount':amount,'left':left}))
@@ -80,11 +84,11 @@ def decide_form(request):
         _financing_type = request.POST.get('financing_type','')
         if config.part !=1:
             return  HttpResponseRedirect('/decide/')
-        mydecides = Decision.objects.filter(financing_name = config.name,from_user=request.user.username,financing_part = 2,status=1)
+        mydecides = Decision.objects.filter(financing_name = config.name,to_user=request.user.username,financing_part = 2,status=1)
         _amount = int(request.user.last_name)
         hasRecieve = 0
         for mydecide in mydecides:
-            hasRecieve+=mydecide.amount
+            hasRecieve+=int(mydecide.amount)
         if _amount-hasRecieve < 0:
             return  HttpResponseRedirect('/decide/')
         _amount = _amount - hasRecieve
